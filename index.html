@@ -3,8 +3,25 @@
   <head>
     <meta charset="utf-8">
     <title></title>
+    <script src="opencv.js" charset="utf-8"></script>
+    <script src="paper.min.js" charset="utf-8"></script>
+    <style media="screen">
+      body {
+        margin: 0 auto
+      }
+      #drawing {
+        display: block;
+      }
+    </style>
   </head>
   <body>
-    <span>&#128064;</span>
+    <!-- <img src="lol.jpg" alt="" id="img"> -->
+    <video autoplay id="cam"></video>
+    <canvas id="vidCapture"></canvas>
+
+    <canvas id="drawing" width="400" height="400"></canvas>
+    <button type="button" name="save" onclick="saveCanvas()">Save</button>
+    
+    <script src="main.js" charset="utf-8"></script>
   </body>
 </html>
