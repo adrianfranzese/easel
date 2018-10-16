@@ -4,30 +4,75 @@ let cannyMin = 100
 let cannyMax = 175
 let simplifyFactor = 2 // 2 to 30?
 // TODO: create list of colour schemes
+
+let colourSchemes = [
+  ['#f46572', '#f58c93', '#eaedf4', '#efcc57', '#f05152'],
+  ['#ff6138', '#ffff9d', '#beeb9f', '#79bd8f', '#00a388'],
+  ['#74d3ae', '#678d58', '#a6c48a', '#f6e7cb', '#dd9787'],
+  ['#1c7c54', '#73e2a7', '#a6c48a', '#def4c6', '#1b512d'],
+  ['#ffe74c', '#ff5964', '#f5f5f5', '#6bf178', '#35a7ff'],
+  ['#ff4e50', '#fc913a', '#f9d423', '#ede574', '#e1f5c4'],
+  ['#52489c', '#4062bb', '#59c3c3', '#ebebeb', '#f45b69'],
+  ['#ea8c55', '#c75146', '#ad2e24', '#81171b', '#540804'],
+  ['#2b2d42', '#8d99ae', '#ad2e24', '#edf2f4', '#ef233c'],
+  ['#ffcad4', '#b0d0d3', '#c08497', '#f7af9d', '#f4e1de'],
+  ['#3d315b', '#444b6e', '#708b75', '#9ab87a', '#f8f991']
+]
+
+let colourScheme
 window.onload = function () {
   paper.setup('drawing')
 
   let video = document.getElementById("cam") // load video element
-      video.height = 100
-      video.width = 140
   let c = document.getElementById('vidCapture')
-      c.width = video.width
-      c.height = video.height
   let cx = c.getContext('2d')
 
-  // Create some blank OpenCV Matrices to draw load data into
-  let source = new cv.Mat(video.height, video.width, cv.CV_8UC4)
-  let contours = new cv.MatVector()
-  let hierarchy = new cv.Mat()
-  let hull = new cv.MatVector();
+  function setVideoDimensions() {
+    video.width = 140
+    video.height = 100
+
+    c.width = video.width
+    c.height = video.height
+  }
+
+  // Declare OpenCV mats
+  let source
+  let contours
+  let hierarchy
+  let hull
+
+  function initMats() {
+    // initialise mats on run
+    source = new cv.Mat(video.height, video.width, cv.CV_8UC4)
+    contours = new cv.MatVector()
+    hierarchy = new cv.Mat()
+    hull = new cv.MatVector();
+  }
+
+  function clearMats() {
+    // clear mats when finished with them this cycle
+    source.delete();
+    contours.delete();
+    hierarchy.delete();
+    hull.delete();
+  }
+
   // let vOutput = new cv.Mat(video.height, video.width, cv.CV_8UC1)
   // let source = cv.imread('img')
   // let output = cv.Mat.zeros(source.rows, source.cols, cv.CV_8UC3)
 
 
+  let videoConstraints = {
+    audio: false,
+    video: { facingMode: "user" },
+  }
+
+
   // initialise webcam
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+  navigator.mediaDevices.getUserMedia(videoConstraints)
     .then(stream => {
+      setVideoDimensions()
+
       video.srcObject = stream
       video.play()
       processVideo()
@@ -37,7 +82,8 @@ window.onload = function () {
     .catch(e => console.error(e))
 
     function processVideo() {
-      // OPTIMIZE:  initMats()
+      initMats()
+
       cx.drawImage(video, 0, 0, video.width, video.height)
       source = cv.imread(c)
       source = drawEdges(source, cannyMin, cannyMax)
@@ -47,6 +93,8 @@ window.onload = function () {
 
       // delete previous paths
       paper.project.activeLayer.removeChildren()
+
+      colourScheme = randomIndex(colourSchemes)
 
       for (let i = 0; i < contours.size(); i++) {
         let contour = contours.get(i)
@@ -61,7 +109,7 @@ window.onload = function () {
       paper.project.activeLayer.scale(2)
       paper.project.activeLayer.position = paper.view.center;
 
-      // OPTIMIZE: clearMats()
+      clearMats()
       // Only load next frame every 3 seconds
       setTimeout(function() {
         requestAnimationFrame(processVideo)
@@ -73,7 +121,6 @@ window.onload = function () {
 
   // cv.cvtColor(source, source, cv.COLOR_RGBA2GRAY, 0)
   // cv.threshold(source, source, 50, 80, cv.THRESH_BINARY_INV)
-
 
   function drawEdges(_input, _minVal, _maxVal) {
     cannyOutput = new cv.Mat();
@@ -103,11 +150,12 @@ window.onload = function () {
     thisHull = thisHull.data32S
 
     let fill = new paper.Path({
-      fillColor: {
-        hue: Math.random() * 360,
-        saturation: 0.8,
-        brightness: 1
-      },
+      // fillColor: {
+      //   hue: Math.random() * 360,
+      //   saturation: 0.8,
+      //   brightness: 1
+      // },
+      fillColor: randomIndex(colourScheme),
       blendMode: 'multiply'
     })
     // console.log(thisHull);
@@ -171,7 +219,7 @@ window.onload = function () {
   //   cv.drawContours(output, contours, i, color, 1, cv.LINE_8, hierarchy, 100);
   // }
   // cv.imshow('canvas', source);
-  // source.delete(); output.delete(); contours.delete(); hierarchy.delete();
+  //
 }
 
 function saveCanvas() {
@@ -198,3 +246,9 @@ function randomBetween(min, max) {
 function constrain(n, low, high) {
   return Math.max(Math.min(n, high), low);
 };
+
+
+// from https://css-tricks.com/snippets/javascript/select-random-item-array/
+function randomIndex(thisArray) {
+  return thisArray[Math.floor(Math.random()*thisArray.length)]
+}
