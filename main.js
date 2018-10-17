@@ -1,9 +1,11 @@
+let toggleBlob = document.getElementById('toggleBlob')
+let toggleFace = document.getElementById('toggleFace')
+
 // TODO: parametize these
 let squiggle = 0.25 // 0.25 to 0.9
 let cannyMin = 100
 let cannyMax = 175
-let simplifyFactor = 2 // 2 to 30?
-// TODO: create list of colour schemes
+let simplifyFactor = 5 // 2 to 30?
 
 let colourSchemes = [
   ['#f46572', '#f58c93', '#eaedf4', '#efcc57', '#f05152'],
@@ -20,8 +22,17 @@ let colourSchemes = [
 ]
 
 let colourScheme
-window.onload = function () {
+window.onload = function() {
   paper.setup('drawing')
+  let noTool = new paper.Tool()
+  let pencil = new paper.Tool()
+  // let airbrush = new paper.Tool()
+
+  // FIXME: tidy up how layers are mananged
+  let blobLayer = new paper.Layer()
+  let personLayer = new paper.Layer()
+  let drawLayer = new paper.Layer()
+  // let airbrush = new paper.Tool()
 
   let video = document.getElementById("cam") // load video element
   let c = document.getElementById('vidCapture')
@@ -57,16 +68,12 @@ window.onload = function () {
     hull.delete();
   }
 
-  // let vOutput = new cv.Mat(video.height, video.width, cv.CV_8UC1)
-  // let source = cv.imread('img')
-  // let output = cv.Mat.zeros(source.rows, source.cols, cv.CV_8UC3)
-
-
   let videoConstraints = {
     audio: false,
-    video: { facingMode: "user" },
+    video: {
+      facingMode: "user"
+    },
   }
-
 
   // initialise webcam
   navigator.mediaDevices.getUserMedia(videoConstraints)
@@ -76,48 +83,44 @@ window.onload = function () {
       video.srcObject = stream
       video.play()
       processVideo()
-      // initRaster(c.width, c.height)
-      // streamReady = true
     })
     .catch(e => console.error(e))
 
-    function processVideo() {
-      initMats()
+  function processVideo() {
+    initMats()
 
-      cx.drawImage(video, 0, 0, video.width, video.height)
-      source = cv.imread(c)
-      source = drawEdges(source, cannyMin, cannyMax)
-      cv.imshow(c, source)
+    cx.drawImage(video, 0, 0, video.width, video.height)
+    source = cv.imread(c)
+    source = drawEdges(source, cannyMin, cannyMax)
+    cv.imshow(c, source)
 
-      cv.findContours(source, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+    cv.findContours(source, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
 
-      // delete previous paths
-      paper.project.activeLayer.removeChildren()
+    // delete previous paths
+    blobLayer.removeChildren()
+    personLayer.removeChildren()
 
-      colourScheme = randomIndex(colourSchemes)
+    colourScheme = randomIndex(colourSchemes)
 
-      for (let i = 0; i < contours.size(); i++) {
-        let contour = contours.get(i)
-        let area = cv.contourArea(contour, false);
-        // console.log(area);
-        // if (contour.rows > 20) {
-        if (area > 1) {
-          drawHull(contour)
-          drawAContour(contour)
-        }
+    for (let i = 0; i < contours.size(); i++) {
+      let contour = contours.get(i)
+      let area = cv.contourArea(contour, false);
+      if (area > 1) {
+        if (toggleBlob.checked) { drawHull(contour) }
+        if (toggleFace.checked) { drawAContour(contour) }
       }
-      paper.project.activeLayer.scale(2)
-      paper.project.activeLayer.position = paper.view.center;
-
-      clearMats()
-      // Only load next frame every 3 seconds
-      setTimeout(function() {
-        requestAnimationFrame(processVideo)
-      }, 3000)
     }
+    blobLayer.scale(2.5)
+    blobLayer.position = paper.view.center;
+    personLayer.scale(2.5)
+    personLayer.position = paper.view.center;
 
-  // let canvas = document.getElementById('canvas')
-  // let ctx = canvas.getContext('2d')
+    clearMats()
+    // Only load next frame every 3 seconds
+    setTimeout(function() {
+      requestAnimationFrame(processVideo)
+    }, 3000)
+  }
 
   // cv.cvtColor(source, source, cv.COLOR_RGBA2GRAY, 0)
   // cv.threshold(source, source, 50, 80, cv.THRESH_BINARY_INV)
@@ -126,42 +129,38 @@ window.onload = function () {
     cannyOutput = new cv.Mat();
     cv.cvtColor(_input, _input, cv.COLOR_RGBA2GRAY);
     cv.equalizeHist(_input, _input);
-    // cv.imshow(c, _input)
     cv.Canny(_input, cannyOutput, _minVal, _maxVal, 3, false);
     return cannyOutput;
   }
 
   function drawPoints(thisContour, thisPath) {
-    for (let c = 0; c < thisContour.length; c+=2) {
+    // https://stackoverflow.com/questions/43108751/convert-contour-paths-to-svg-paths
+    for (let c = 0; c < thisContour.length; c += 2) {
       // [x1][y1],[x2][y2]....
       //  c  +1 ,  c  +1 ....
       thisPath.add(new paper.Point({
         x: thisContour[c],
-        y: thisContour[c+1]
+        y: thisContour[c + 1]
       }))
-      // ctx.lineTo(thisContour[c], thisContour[c+1]);
     }
   }
 
   // QUESTION: should this use threshold instead of canny?
   function drawHull(thisContour) {
+    blobLayer.activate()
+
     let thisHull = new cv.Mat();
     cv.convexHull(thisContour, thisHull, false, true);
     thisHull = thisHull.data32S
 
     let fill = new paper.Path({
-      // fillColor: {
-      //   hue: Math.random() * 360,
-      //   saturation: 0.8,
-      //   brightness: 1
-      // },
       fillColor: randomIndex(colourScheme),
       blendMode: 'multiply'
     })
-    // console.log(thisHull);
     drawPoints(thisHull, fill)
     fill.closePath()
     // fill.reduce()
+    // OPTIMIZE: Call once when all are done?
     fill.simplify()
     // TODO which smoothing type to use?
     fill.smooth({
@@ -174,10 +173,8 @@ window.onload = function () {
 
 
   function drawAContour(thisContour) {
-    // thisContour = thisContour.data16U
     thisContour = thisContour.data32S
-    // ctx.fillStyle = 'red';
-    // ctx.beginPath();
+    personLayer.activate()
     let path = new paper.Path({
       strokeColor: 'midnightblue',
       selected: false,
@@ -188,6 +185,7 @@ window.onload = function () {
     drawPoints(thisContour, path)
 
     path.reduce()
+    // OPTIMIZE: Call once when all are done?
     path.simplify(simplifyFactor)
     // TODO which smoothing type to use?
     path.smooth({
@@ -197,29 +195,51 @@ window.onload = function () {
 
     // IDEA: asign weight based on contour properties?
     path.strokeWidth = 0.5 + Math.random() * 2
-
-    // path.onFrame = function(frame) {
-    //   let sinus = Math.sin(this.index + frame.count / 30) / 100
-    //   // let prevStroke = this.strokeWidth
-    //   // console.log(sinus);
-    //   // this.strokeWidth = map(sinus, -1, 1, 0.5, 2)
-    //   this.strokeWidth += sinus
-    //
-    //   // for (segment of this.segments) {
-    //   //   segment.point = segment.point.add(sinus*2)
-    //   // }
-    // }
-    // ctx.closePath();
-    // ctx.fill();
   }
-  // ---------------
 
-  // for (let i = 0; i < contours.size(); ++i) {
-  //   let color = new cv.Scalar(255, 255, 255);
-  //   cv.drawContours(output, contours, i, color, 1, cv.LINE_8, hierarchy, 100);
-  // }
-  // cv.imshow('canvas', source);
-  //
+  // Switch current drawing tool
+  let mouseTools = document.getElementsByName('mouseTool')
+  mouseTools.forEach(mouseTool => {
+    mouseTool.addEventListener('click', () => {
+      switch (mouseTool.value) {
+        case 'noTool':
+          noTool.activate()
+          paper.view.element.style.cursor = `auto`
+          console.log('no tool');
+          break;
+        case 'pencil':
+          pencil.activate()
+          paper.view.element.style.cursor = `url('icons/pencilUp.png'), pointer`
+          console.log('pencil');
+          break;
+      }
+    })
+  })
+
+  let pencilPath
+  pencil.minDistance = 10
+  pencil.onMouseDown = function(click) {
+    drawLayer.activate()
+    pencilPath = new paper.Path()
+    pencilPath.style = {
+      strokeColor: 'midnightblue',
+      strokeWidth: 0.25,
+      opacity: 0.25
+    }
+  }
+
+  pencil.onMouseDrag = function(click) {
+    drawLayer.activate()
+    pencilPath.add(click.point);
+    let total = pencilPath.segments.length
+    let prev = pencilPath.segments[total - 5]
+
+    if (prev) {
+      let line = new paper.Path.Line(prev.point, click.point)
+      line.style = pencilPath.style
+      line.opacity = Math.random()
+    }
+  }
 }
 
 function saveCanvas() {
@@ -232,6 +252,10 @@ function saveCanvas() {
   document.body.appendChild(dw);
   dw.click();
   document.body.removeChild(dw)
+}
+
+function clearDrawing() {
+  paper.project.layers[2].clear()
 }
 
 function map(n, in_min, in_max, out_min, out_max) {
@@ -250,5 +274,5 @@ function constrain(n, low, high) {
 
 // from https://css-tricks.com/snippets/javascript/select-random-item-array/
 function randomIndex(thisArray) {
-  return thisArray[Math.floor(Math.random()*thisArray.length)]
+  return thisArray[Math.floor(Math.random() * thisArray.length)]
 }
