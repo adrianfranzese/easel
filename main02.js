@@ -1,6 +1,10 @@
 let toggleBlob = document.getElementById('toggleBlob')
 let toggleFace = document.getElementById('toggleFace')
 
+let video = document.getElementById("cam") // load video element
+let c = document.getElementById('vidCapture')
+let cx = c.getContext('2d')
+
 // TODO: parametize these
 let squiggle = 0.25 // 0.25 to 0.9
 let cannyMin = 100
@@ -34,13 +38,14 @@ window.onload = function() {
   let drawLayer = new paper.Layer()
   // let airbrush = new paper.Tool()
 
-  let video = document.getElementById("cam") // load video element
-  let c = document.getElementById('vidCapture')
-  let cx = c.getContext('2d')
-
   function setVideoDimensions() {
-    video.width = 140
-    video.height = 100
+    // video.width = 140
+    // video.height = 100
+    //
+    // c.width = video.width
+    // c.height = video.height
+    video.width = video.videoWidth / 4
+    video.height = video.videoHeight / 4
 
     c.width = video.width
     c.height = video.height
@@ -54,7 +59,7 @@ window.onload = function() {
 
   function initMats() {
     // initialise mats on run
-    source = new cv.Mat(video.height, video.width, cv.CV_8UC4)
+    source = new cv.Mat(video.videoHeight / 4, video.videoWidth / 4, cv.CV_8UC4)
     contours = new cv.MatVector()
     hierarchy = new cv.Mat()
     hull = new cv.MatVector();
@@ -78,7 +83,8 @@ window.onload = function() {
   // initialise webcam
   navigator.mediaDevices.getUserMedia(videoConstraints)
     .then(stream => {
-      setVideoDimensions()
+      // setVideoDimensions()
+      video.addEventListener('loadedmetadata', setVideoDimensions, false)
 
       video.srcObject = stream
       video.play()
@@ -102,6 +108,7 @@ window.onload = function() {
 
     colourScheme = randomIndex(colourSchemes)
 
+    // console.log(contours.size());
     for (let i = 0; i < contours.size(); i++) {
       let contour = contours.get(i)
       let area = cv.contourArea(contour, false);
@@ -110,16 +117,17 @@ window.onload = function() {
         if (toggleFace.checked) { drawAContour(contour) }
       }
     }
-    blobLayer.scale(4)
+    blobLayer.scale(1.5)
     blobLayer.position = paper.view.center;
-    personLayer.scale(4)
+    personLayer.scale(1.5)
     personLayer.position = paper.view.center;
 
     clearMats()
     // Only load next frame every 3 seconds
     setTimeout(function() {
       requestAnimationFrame(processVideo)
-    }, 3000)
+    // }, 3000)
+  }, 1500)
   }
 
   // cv.cvtColor(source, source, cv.COLOR_RGBA2GRAY, 0)
@@ -180,6 +188,7 @@ window.onload = function() {
       selected: false,
       strokeCap: 'round',
       strokeJoin: 'round',
+      strokeScaling: false,
     })
 
     drawPoints(thisContour, path)
@@ -231,8 +240,10 @@ window.onload = function() {
   pencil.onMouseDrag = function(click) {
     drawLayer.activate()
     pencilPath.add(click.point);
+    // let buffer = Math.ceil(paper.project.layers[1].children.length / 10)
     let total = pencilPath.segments.length
     let prev = pencilPath.segments[total - 5]
+    // let prev = pencilPath.segments[total - buffer]
 
     if (prev) {
       let line = new paper.Path.Line(prev.point, click.point)
