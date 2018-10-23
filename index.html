@@ -10,9 +10,9 @@
     <script src="paper.min.js" charset="utf-8"></script>
     <style media="screen">
       html {
-        position: fixed;
-        overflow: hidden;
-        left: -5px;
+        /* position: fixed; */
+        /* overflow: hidden; */
+        /* left: -5px; */
       }
 
       body {
@@ -32,7 +32,7 @@
       }
 
       #videoPreviews {
-        display: none;
+        /* display: none; */
       }
 
       #toolbox {
@@ -53,15 +53,19 @@
         border: none;
         border-radius: 3px;
         cursor: pointer;
+        outline: none;
       }
 
       #toolbox input:checked, #toolbox input:active {
         background-color: #c5c5c5;
-        outline: none;
       }
 
       #toolbox input#pencilTool {
         background-image: url('icons/pencilDown.png');
+      }
+
+      #toolbox input#airbrushTool {
+        background-image: url('icons/airbrush.png');
       }
 
       #toolbox input#toggleBlob {
@@ -71,12 +75,21 @@
       #toolbox input#toggleFace {
         background-image: url('icons/face.png');
       }
+
+      #toolbox button {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-color: #eaeaea;
+        border-radius: 3px;
+      }
     </style>
   </head>
   <body>
     <div id="toolbox">
       <input type="radio" name="mouseTool" id="noTool" value="noTool" checked>
       <input type="radio" name="mouseTool" id="pencilTool" value="pencil">
+      <input type="radio" name="mouseTool" id="airbrushTool" value="airbrush">
       <input type="checkbox" name="toggleBlob" value="" id="toggleBlob">
       <input type="checkbox" name="toggleFace" value="" id="toggleFace" checked>
       <br>
@@ -92,6 +105,6 @@
       <canvas id="vidCapture"></canvas>
     </div>
 
-    <script src="main02.js" charset="utf-8"></script>
+    <script src="main03.js" charset="utf-8"></script>
   </body>
 </html>
