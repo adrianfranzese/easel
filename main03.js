@@ -7,8 +7,8 @@ let cx = c.getContext('2d')
 
 // TODO: parametize these
 let squiggle = 0.25 // 0.25 to 0.9
-let cannyMin = 100
-let cannyMax = 175
+let cannyMin = 50
+let cannyMax = 200
 let simplifyFactor = 2 // 2 to 30?
 
 let colourSchemes = [
