@@ -1,14 +1,17 @@
 let toggleBlob = document.getElementById('toggleBlob')
 let toggleFace = document.getElementById('toggleFace')
 
+// let paused = document.getElementById('play-pause')
+// let loop
+
 let video = document.getElementById("cam") // load video element
 let c = document.getElementById('vidCapture')
 let cx = c.getContext('2d')
 
 // TODO: parametize these
-let squiggle = 0.25 // 0.25 to 0.9
-let cannyMin = 50
-let cannyMax = 200
+let squiggle = 1 // 0.25 to 0.9
+let cannyMin = 100
+let cannyMax = 175
 let simplifyFactor = 2 // 2 to 30?
 
 let colourSchemes = [
@@ -29,9 +32,12 @@ let colourScheme
 window.onload = function() {
   paper.setup('drawing')
   calcDimensions()
+
   let noTool = new paper.Tool()
   let pencil = new paper.Tool()
   let airbrush = new paper.Tool()
+
+  pencil.activate()
 
   // FIXME: tidy up how layers are mananged
   let blobLayer = new paper.Layer()
@@ -99,9 +105,9 @@ window.onload = function() {
     source = cv.imread(c)
     // source = removeBackground(source)
     source = drawEdges(source, cannyMin, cannyMax)
-    cv.imshow(c, source)
+    // cv.imshow(c, source)
 
-    cv.findContours(source, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+    cv.findContours(source, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_TC89_KCOS)
 
     // delete previous paths
     blobLayer.removeChildren()
@@ -113,22 +119,21 @@ window.onload = function() {
     for (let i = 0; i < contours.size(); i++) {
       let contour = contours.get(i)
       let area = cv.contourArea(contour, false);
-      if (area > 0) {
-        if (toggleBlob.checked) { drawHull(contour) }
-        if (toggleFace.checked) { drawAContour(contour) }
-      }
+      if (area > 20 && toggleBlob.checked) { drawHull(contour) }
+      if (area >  0 && toggleFace.checked) { drawAContour(contour) }
     }
+
     blobLayer.scale(4)
     blobLayer.position = paper.view.center;
     personLayer.scale(4)
     personLayer.position = paper.view.center;
 
     clearMats()
-    // Only load next frame every 3 seconds
-    setTimeout(function() {
+
+    // Only load next frame every 3.5 seconds
+    loop = setTimeout(function() {
       requestAnimationFrame(processVideo)
-    }, 3000)
-  // }, 1500)
+    }, 3500)
   }
 
   // cv.cvtColor(source, source, cv.COLOR_RGBA2GRAY, 0)
@@ -161,7 +166,7 @@ window.onload = function() {
   function drawEdges(_input, _minVal, _maxVal) {
     cannyOutput = new cv.Mat();
     cv.cvtColor(_input, _input, cv.COLOR_RGBA2GRAY);
-    // cv.equalizeHist(_input, _input);
+    cv.equalizeHist(_input, _input);
     cv.Canny(_input, cannyOutput, _minVal, _maxVal, 3, false);
     return cannyOutput;
   }
@@ -188,13 +193,14 @@ window.onload = function() {
 
     let fill = new paper.Path({
       fillColor: randomIndex(colourScheme),
-      blendMode: 'multiply'
+      blendMode: 'multiply',
+      // selected: true
     })
     drawPoints(thisHull, fill)
     fill.closePath()
     // fill.reduce()
     // OPTIMIZE: Call once when all are done?
-    fill.simplify()
+    // fill.simplify(0)
     // TODO which smoothing type to use?
     fill.smooth({
       // type: 'continuous'
@@ -210,7 +216,8 @@ window.onload = function() {
     thisContour = thisContour.data32S
     personLayer.activate()
     let path = new paper.Path({
-      strokeColor: 'midnightblue',
+      // strokeColor: 'midnightblue',
+      strokeColor: 'white',
       selected: false,
       strokeCap: 'round',
       strokeJoin: 'round',
@@ -224,24 +231,27 @@ window.onload = function() {
     path.simplify(simplifyFactor)
     // TODO which smoothing type to use?
     path.smooth({
-      type: 'geometric',
+      type: 'catmull-rom',
       factor: squiggle
     })
+    // path.smooth({
+    //   type: 'continuous'
+    // })
 
     // BADIDEA: asign weight based on contour properties?
     path.strokeWidth = 0.5 + Math.random() * 2
-    path.dashArray = [path.length + 50]
-    path.dashOffset = path.length + 50
+    // path.dashArray = [path.length + 50]
+    // path.dashOffset = path.length + 50
     // path.strokeWidth = constrain(area*0.01, 0.5, 2)
 
-    path.onFrame = function (frame) {
+    // path.onFrame = function (frame) {
       // this.dashOffset = path.index + frame.count
       // if (this.dashOffset != this.length) {
       //   this.dashOffset = frame.count
       // } else {
       //   this.dashOffset = 0
       // }
-    }
+    // }
   }
 
   // Switch current drawing tool
@@ -322,8 +332,9 @@ window.onload = function() {
 }
 
 function calcDimensions() {
-  let toolboxHeight = document.getElementById('toolbox').clientHeight
-  let minHeight = document.documentElement.clientHeight - 40 - toolboxHeight
+  // let toolboxHeight = document.getElementById('toolbox').clientHeight
+  // let minHeight = document.documentElement.clientHeight - 40 - toolboxHeight
+  let minHeight = document.body.clientHeight - 40
   paper.view.viewSize.height = minHeight
   paper.view.viewSize.width = minHeight
 }

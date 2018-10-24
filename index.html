@@ -9,7 +9,11 @@
     <script src="opencv.js" charset="utf-8"></script>
     <script src="paper.min.js" charset="utf-8"></script>
     <style media="screen">
+      /* @import url('https://fonts.googleapis.com/css?family=Roboto+Condensed'); */
+      @import url('https://fonts.googleapis.com/css?family=Fira+Mono');
       html {
+        /* font-family: 'Roboto Condensed', sans-serif; */
+        font-family: 'Fira Mono', monospace;
         /* position: fixed; */
         /* overflow: hidden; */
         /* left: -5px; */
@@ -17,28 +21,35 @@
 
       body {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
+        align-items: flex-start;
         min-height: 100vh;
         margin: 0;
         padding: 0;
+        /* background: #fbfbfb61; */
+        background: 'black';
       }
 
       #drawing {
         display: block;
-        /* cursor: url('icons/pencilUp.png'), pointer; */
-        box-shadow: 0 2px 5px gray;
-        margin: 0 auto;
+        cursor: url('icons/pencilUp.png'), pointer;
+        box-shadow: 0 2px 8px lightgrey;
+        margin: auto;
         border-radius: 3px;
       }
 
-      #videoPreviews {
-        /* display: none; */
+      #videoPreviews{
+        /* display: block; */
+        display: flex;
+        flex-direction: column;
+        display: none;
       }
 
       #toolbox {
         display: flex;
         margin: 1em;
-        flex-direction: row;
+        flex-direction: column;
+        width: 44px;
       }
 
       #toolbox input {
@@ -54,9 +65,18 @@
         border-radius: 3px;
         cursor: pointer;
         outline: none;
+        margin: 0;
+        margin-bottom: 1em;
       }
 
-      #toolbox input:checked, #toolbox input:active {
+      #toolbox label {
+        font-size: 10px;
+        border-bottom: 1px solid #eaeaea;
+        margin-bottom: 0.25em;
+        text-transform: uppercase;
+      }
+
+      #toolbox input:checked, #toolbox input:active, #toolbox button:active, #toolbox button:hover  {
         background-color: #c5c5c5;
       }
 
@@ -76,37 +96,45 @@
         background-image: url('icons/face.png');
       }
 
-      #toolbox input#squiggleRange, #toolbox input#simplifyRange {
-        width: 100px;
-        -webkit-appearance: slider-horizontal;
-        -moz-appearance: slider-horizontal;
-        appearance: slider-horizontal;
-      }
-
       #toolbox button {
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
         background-color: #eaeaea;
-        border-radius: 3px;
+        height: 44px;
+        border: none;
+        font-family: inherit;
+        text-transform: uppercase;
+        font-size: 10px;
+        cursor: pointer;
+      }
+
+      #toolbox button:first-of-type {
+        border-radius: 3px 3px 0 0;
+        border-bottom: 1px solid #c5c5c5;
+      }
+      #toolbox button:last-of-type {
+        border-radius: 0 0 3px 3px;
       }
     </style>
   </head>
   <body>
     <div id="toolbox">
-      <input type="radio" name="mouseTool" id="noTool" value="noTool" checked>
-      <input type="radio" name="mouseTool" id="pencilTool" value="pencil">
+      <!-- <input type="radio" name="mouseTool" id="noTool" value="noTool" checked> -->
+      <label for="pencilTool">Pencil</label>
+      <input type="radio" name="mouseTool" id="pencilTool" value="pencil" checked>
+      <label for="airbrushTool">Airbrush</label>
       <input type="radio" name="mouseTool" id="airbrushTool" value="airbrush">
+      <br>
+      <label for="toggleBlob">Toggle Colours</label>
       <input type="checkbox" name="toggleBlob" value="" id="toggleBlob">
+      <label for="toggleFace">Toggle Webcam</label>
       <input type="checkbox" name="toggleFace" value="" id="toggleFace" checked>
+      <!-- <label for="play-pause">Pause Animation</label>
+      <input type="checkbox" name="togglePause" value="" id="play-pause"> -->
       <br>
-      <pre>Squiggleness</pre>
-      <input type="range" id="squiggleRange" value="0.25" min="0.25" max="0.9" step="0.01" oninput="squiggle = squiggleRange.value">
-      <pre>Loopyness</pre>
-      <input type="range" id="simplifyRange" value="5" min="2" max="30" oninput="simplifyFactor = simplifyRange.value">
-      <br>
-      <button type="button" name="save" onclick="saveCanvas()">Save</button>
-      <button type="button" name="clear" onclick="clearDrawing()">Clear</button>
+      <button type="button" name="clear" id="clear" onclick="clearDrawing()">Clear</button>
+      <button type="button" name="save" id="save" onclick="saveCanvas()">Save</button>
     </div>
 
     <canvas id="drawing" width="300" height="300"></canvas>
