@@ -266,12 +266,12 @@ window.onload = function() {
           break;
         case 'pencil':
           pencil.activate()
-          paper.view.element.style.cursor = `url('icons/pencilUp.png'), pointer`
+          paper.view.element.style.cursor = `url('icons/pencilMouse.png'), pointer`
           console.log('pencil tool');
           break;
         case 'airbrush':
           airbrush.activate()
-          paper.view.element.style.cursor = `url('icons/airbrush.png'), pointer`
+          paper.view.element.style.cursor = `url('icons/airbrushMouse.png'), pointer`
           console.log('airbrush tool');
           break;
       }
@@ -284,7 +284,7 @@ window.onload = function() {
     drawLayer.activate()
     pencilPath = new paper.Path()
     pencilPath.style = {
-      strokeColor: 'midnightblue',
+      strokeColor: 'white',
       strokeWidth: 0.25,
       opacity: 0.25
     }
