@@ -139,30 +139,6 @@ window.onload = function() {
   // cv.cvtColor(source, source, cv.COLOR_RGBA2GRAY, 0)
   // cv.threshold(source, source, 50, 80, cv.THRESH_BINARY_INV)
 
-  function removeBackground(_input) {
-    // cv.cvtColor(_input, _input, cv.COLOR_RGBA2GRAY);
-    // let mask = new cv.Mat();
-    // let bgdModel = new cv.Mat();
-    // let fgdModel = new cv.Mat();
-    // let rect = new cv.Rect(video.width/2 - 50, video.height/2 + 50, video.width/2 + 50, video.width/2 +50);
-    // cv.grabCut(_input, mask, rect, bgdModel, fgdModel, 1, cv.GC_INIT_WITH_RECT);
-    //
-    // for (let i = 0; i < _input.rows; i++) {
-    //   for (let j = 0; j < _input.cols; j++) {
-    //       if (mask.ucharPtr(i, j)[0] == 0 || mask.ucharPtr(i, j)[0] == 2) {
-    //           _input.ucharPtr(i, j)[0] = 0;
-    //           _input.ucharPtr(i, j)[1] = 0;
-    //           // _input.ucharPtr(i, j)[2] = 0;
-    //       }
-    //   }
-    // }
-
-    let fgmask = new cv.Mat(video.height, video.width, cv.CV_8UC1);
-    let fgbg = new cv.BackgroundSubtractorMOG2(500, 16, true);
-
-    return source;
-  }
-
   function drawEdges(_input, _minVal, _maxVal) {
     cannyOutput = new cv.Mat();
     cv.cvtColor(_input, _input, cv.COLOR_RGBA2GRAY);
@@ -266,12 +242,12 @@ window.onload = function() {
           break;
         case 'pencil':
           pencil.activate()
-          paper.view.element.style.cursor = `url('icons/pencilUp.png'), pointer`
+          paper.view.element.style.cursor = `url('icons/pencilMouse.png'), pointer`
           console.log('pencil tool');
           break;
         case 'airbrush':
           airbrush.activate()
-          paper.view.element.style.cursor = `url('icons/airbrush.png'), pointer`
+          paper.view.element.style.cursor = `url('icons/airbrushMouse.png'), pointer`
           console.log('airbrush tool');
           break;
       }
@@ -284,7 +260,7 @@ window.onload = function() {
     drawLayer.activate()
     pencilPath = new paper.Path()
     pencilPath.style = {
-      strokeColor: 'midnightblue',
+      strokeColor: 'white',
       strokeWidth: 0.25,
       opacity: 0.25
     }
