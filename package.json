@@ -23,5 +23,8 @@
   "homepage": "https://adrianfranzese.github.io/easel",
   "devDependencies": {
     "parcel-bundler": "^1.12.3"
-  }
+  },
+  "browserslist": [
+    "last 2 years"
+  ]
 }
