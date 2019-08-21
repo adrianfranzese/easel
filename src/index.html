@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Easel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <style media="screen">
+      html {
+        font-family: sans-serif;
+        font-weight: 400;
+        font-style: normal;
+      }
+
+      body {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        background: #fbfbfb61;
+      }
+
+      #drawing {
+        display: block;
+        box-shadow: 0 2px 8px lightgrey;
+        margin: auto;
+        border-radius: 3px;
+      }
+
+      #cam {
+        display: flex;
+        flex-direction: column;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main id='app'></main>
+
+    <noscript>
+      <strong>This app uses Javascript, sorry :(</strong>
+    </noscript>
+
+    <script src="./index.js" charset="utf-8"></script>
+  </body>
+</html>
