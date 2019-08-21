@@ -37,7 +37,7 @@ window.onload = function() {
   let pencil = new paper.Tool()
   let airbrush = new paper.Tool()
 
-  pencil.activate()
+  // pencil.activate()
 
   // FIXME: tidy up how layers are mananged
   let blobLayer = new paper.Layer()
@@ -192,8 +192,8 @@ window.onload = function() {
     thisContour = thisContour.data32S
     personLayer.activate()
     let path = new paper.Path({
-      // strokeColor: 'midnightblue',
-      strokeColor: 'white',
+      strokeColor: 'midnightblue',
+      // strokeColor: 'white',
       selected: false,
       strokeCap: 'round',
       strokeJoin: 'round',
@@ -231,80 +231,74 @@ window.onload = function() {
   }
 
   // Switch current drawing tool
-  let mouseTools = document.getElementsByName('mouseTool')
-  mouseTools.forEach(mouseTool => {
-    mouseTool.addEventListener('click', () => {
-      switch (mouseTool.value) {
-        case 'noTool':
-          noTool.activate()
-          paper.view.element.style.cursor = `auto`
-          console.log('no tool');
-          break;
-        case 'pencil':
-          pencil.activate()
-          paper.view.element.style.cursor = `url('icons/pencilMouse.png'), pointer`
-          console.log('pencil tool');
-          break;
-        case 'airbrush':
-          airbrush.activate()
-          paper.view.element.style.cursor = `url('icons/airbrushMouse.png'), pointer`
-          console.log('airbrush tool');
-          break;
-      }
-    })
-  })
+  // let mouseTools = document.getElementsByName('mouseTool')
+  // mouseTools.forEach(mouseTool => {
+  //   mouseTool.addEventListener('click', () => {
+  //     switch (mouseTool.value) {
+  //       case 'noTool':
+  //         noTool.activate()
+  //         paper.view.element.style.cursor = `auto`
+  //         console.log('no tool');
+  //         break;
+  //       case 'pencil':
+  //         pencil.activate()
+  //         paper.view.element.style.cursor = `url('icons/pencilMouse.png'), pointer`
+  //         console.log('pencil tool');
+  //         break;
+  //       case 'airbrush':
+  //         airbrush.activate()
+  //         paper.view.element.style.cursor = `url('icons/airbrushMouse.png'), pointer`
+  //         console.log('airbrush tool');
+  //         break;
+  //     }
+  //   })
+  // })
 
-  let pencilPath
-  pencil.minDistance = 10
-  pencil.onMouseDown = function(click) {
-    drawLayer.activate()
-    pencilPath = new paper.Path()
-    pencilPath.style = {
-      strokeColor: 'white',
-      strokeWidth: 0.25,
-      opacity: 0.25
-    }
-  }
+  // let pencilPath
+  // pencil.minDistance = 10
+  // pencil.onMouseDown = function(click) {
+  //   drawLayer.activate()
+  //   pencilPath = new paper.Path()
+  //   pencilPath.style = {
+  //     strokeColor: 'midnightblue',
+  //     // strokeColor: 'white',
+  //     strokeWidth: 0.25,
+  //     opacity: 0.25
+  //   }
+  // }
 
-  pencil.onMouseDrag = function(click) {
-    drawLayer.activate()
-    pencilPath.add(click.point);
-    // let buffer = Math.ceil(paper.project.layers[1].children.length / 10)
-    let total = pencilPath.segments.length
-    let prev = pencilPath.segments[total - 5]
-    // let prev = pencilPath.segments[total - buffer]
+  // pencil.onMouseDrag = function(click) {
+  //   drawLayer.activate()
+  //   pencilPath.add(click.point);
+  //   // let buffer = Math.ceil(paper.project.layers[1].children.length / 10)
+  //   let total = pencilPath.segments.length
+  //   let prev = pencilPath.segments[total - 5]
+  //   // let prev = pencilPath.segments[total - buffer]
+  //
+  //   if (prev) {
+  //     let line = new paper.Path.Line(prev.point, click.point)
+  //     line.style = pencilPath.style
+  //     line.opacity = Math.random()
+  //   }
+  // }
 
-    if (prev) {
-      let line = new paper.Path.Line(prev.point, click.point)
-      line.style = pencilPath.style
-      line.opacity = Math.random()
-    }
-  }
-
-  let airbrushPath
-  let airbrushColour
-  airbrush.minDistance = 10
-
-  airbrush.onMouseDown = function (click) {
-    airbrushColour = randomIndex(colourScheme)
-  }
-  airbrush.onMouseDrag = function (click) {
-    drawLayer.activate()
-    airbrushPath = new paper.Path.Circle(click.point, click.delta.length)
-    airbrushPath.style = {
-      fillColor: new paper.Color(1, 1, 1, 0.1),
-      shadowColor: airbrushColour,
-      shadowBlur: 40,
-      // blendMode: 'color-burn'
-    }
-
-    // airbrushPath.onFrame = function (frame) {
-    //   // this.position.x += 0.5*Math.cos(frame.time + 0);
-    //   // this.position.y += 0.5*Math.sin(frame.time + 0.1);
-    //   // this.opacity += 0.5*Math.cos(frame.time + 0)
-    //   // this.scale(click.delta.length + 0.5*Math.cos(frame.time + 0))
-    // }
-  }
+  // let airbrushPath
+  // let airbrushColour
+  // airbrush.minDistance = 10
+  //
+  // airbrush.onMouseDown = function (click) {
+  //   airbrushColour = randomIndex(colourScheme)
+  // }
+  // airbrush.onMouseDrag = function (click) {
+  //   drawLayer.activate()
+  //   airbrushPath = new paper.Path.Circle(click.point, click.delta.length)
+  //   airbrushPath.style = {
+  //     fillColor: new paper.Color(1, 1, 1, 0.1),
+  //     shadowColor: airbrushColour,
+  //     shadowBlur: 40,
+  //     // blendMode: 'color-burn'
+  //   }
+  // }
 }
 
 function calcDimensions() {

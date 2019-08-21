@@ -30,14 +30,14 @@
         min-height: 100vh;
         margin: 0;
         padding: 0;
-        /* background: #fbfbfb61; */
-        background: black;
+        background: #fbfbfb61;
+        /* background: black; */
       }
 
       #drawing {
         display: block;
-        cursor: url('icons/pencilMouse.png'), pointer;
-        /* box-shadow: 0 2px 8px lightgrey; */
+        /* cursor: url('icons/pencilMouse.png'), pointer; */
+        box-shadow: 0 2px 8px lightgrey;
         margin: auto;
         border-radius: 3px;
       }
@@ -50,7 +50,8 @@
       }
 
       #toolbox {
-        display: flex;
+        /* display: flex; */
+        display: none;
         margin: 1em;
         flex-direction: column;
         width: 44px;
@@ -125,19 +126,16 @@
   </head>
   <body>
     <div id="toolbox">
-      <!-- <input type="radio" name="mouseTool" id="noTool" value="noTool" checked> -->
       <label for="pencilTool">Pencil</label>
       <input type="radio" name="mouseTool" id="pencilTool" value="pencil" checked>
       <label for="airbrushTool">Airbrush</label>
       <input type="radio" name="mouseTool" id="airbrushTool" value="airbrush">
       <br>
       <label for="toggleBlob">Toggle Colours</label>
-      <input type="checkbox" name="toggleBlob" value="" id="toggleBlob">
+      <input type="checkbox" name="toggleBlob" value="" id="toggleBlob" checked>
       <label for="toggleFace">Toggle Webcam</label>
       <input type="checkbox" name="toggleFace" value="" id="toggleFace" checked>
-      <!-- <label for="play-pause">Pause Animation</label>
-      <input type="checkbox" name="togglePause" value="" id="play-pause"> -->
-      <br>
+      <!-- <br> -->
       <button type="button" name="clear" id="clear" onclick="clearDrawing()">Clear</button>
       <button type="button" name="save" id="save" onclick="saveCanvas()">Save</button>
     </div>
