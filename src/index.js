@@ -1,7 +1,7 @@
-import { createVideoStream, createCamera } from './modules/video'
-import { createElement, mount } from './modules/dom'
+import { createVideoStream, createCamera } from '/modules/video'
+import { createElement, mount } from '/modules/dom'
 
-import { subscribe } from './store/store.js'
+import { subscribe } from '/store/store.js'
 
 function createCanvas(width, height) {
   const canvas = createElement('canvas', {

@@ -1,7 +1,10 @@
 import { createReducer } from '/modules/pubsub.js'
-
 import { SMOOTH, COUNT, VIDEO_FRAME } from '/store/actions'
+// import { closedCubicFromControlPoints as smooth } from '@thi.ng/geom-splines'
 
+setTimeout(function () {
+  importScripts('./cv/init.js')
+}, 0);
 
 let store = {
   count: 0,
@@ -25,16 +28,9 @@ const mutations = {
 
 function myReducer(state, action) {
   switch (action.type) {
-    case COUNT:
-      return { count: state.count + action.payload }
-
-    case SMOOTH:
-      return { poly: mutations.smoothed(state.poly) }
-
     case VIDEO_FRAME:
       const buffer = new Uint8ClampedArray(action.payload.buffer)
       const inverted = mutations.invert(buffer)
-      // const inverted = mutations.invert(action.payload)
       return {
         imageData: inverted,
         width: action.payload.width,
