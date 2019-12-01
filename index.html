@@ -3,26 +3,11 @@
   <head>
     <meta charset="utf-8">
     <title></title>
-    <link rel="stylesheet" href="https://use.typekit.net/vmv5uzu.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1">
-
     <script src="opencv.js" charset="utf-8"></script>
     <script src="paper.min.js" charset="utf-8"></script>
     <style media="screen">
-      /* @import url('https://fonts.googleapis.com/css?family=Roboto+Condensed'); */
-      /* @import url('https://fonts.googleapis.com/css?family=Fira+Mono'); */
-      html {
-        /* font-family: 'Roboto Condensed', sans-serif; */
-        /* font-family: 'Fira Mono', monospace; */
-        /* position: fixed; */
-        /* overflow: hidden; */
-        /* left: -5px; */
-        font-family: attribute-mono, sans-serif;
-        font-weight: 400;
-        font-style: normal;
-      }
-
       body {
         display: flex;
         flex-direction: row;
@@ -31,12 +16,10 @@
         margin: 0;
         padding: 0;
         background: #fbfbfb61;
-        /* background: black; */
       }
 
       #drawing {
         display: block;
-        /* cursor: url('icons/pencilMouse.png'), pointer; */
         box-shadow: 0 2px 8px lightgrey;
         margin: auto;
         border-radius: 3px;
@@ -87,19 +70,19 @@
       }
 
       #toolbox input#pencilTool {
-        background-image: url('icons/pencilDown.png');
+        /* background-image: url('icons/pencilDown.png'); */
       }
 
       #toolbox input#airbrushTool {
-        background-image: url('icons/airbrush.png');
+        /* background-image: url('icons/airbrush.png'); */
       }
 
       #toolbox input#toggleBlob {
-        background-image: url('icons/blob.png');
+        /* background-image: url('icons/blob.png'); */
       }
 
       #toolbox input#toggleFace {
-        background-image: url('icons/face.png');
+        /* background-image: url('icons/face.png'); */
       }
 
       #toolbox button {
@@ -125,7 +108,7 @@
     </style>
   </head>
   <body>
-    <div id="toolbox">
+    <!-- <div id="toolbox">
       <label for="pencilTool">Pencil</label>
       <input type="radio" name="mouseTool" id="pencilTool" value="pencil" checked>
       <label for="airbrushTool">Airbrush</label>
@@ -135,10 +118,10 @@
       <input type="checkbox" name="toggleBlob" value="" id="toggleBlob" checked>
       <label for="toggleFace">Toggle Webcam</label>
       <input type="checkbox" name="toggleFace" value="" id="toggleFace" checked>
-      <!-- <br> -->
+      <br>
       <button type="button" name="clear" id="clear" onclick="clearDrawing()">Clear</button>
       <button type="button" name="save" id="save" onclick="saveCanvas()">Save</button>
-    </div>
+    </div> -->
 
     <canvas id="drawing" width="300" height="300"></canvas>
 
