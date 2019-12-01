@@ -133,7 +133,7 @@ window.onload = function() {
     // Only load next frame every 3.5 seconds
     loop = setTimeout(function() {
       requestAnimationFrame(processVideo)
-    }, 3500)
+    }, 1000)
   }
 
   // cv.cvtColor(source, source, cv.COLOR_RGBA2GRAY, 0)
